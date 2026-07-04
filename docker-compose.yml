@@ -1,0 +1,155 @@
+services:
+  # ----------------------------------------------------------------
+  # Backend API
+  # ----------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      target: runtime
+    container_name: aivora-backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_HOST: postgres
+      REDIS_HOST: redis
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - aivora-net
+
+  # ----------------------------------------------------------------
+  # Celery Worker
+  # ----------------------------------------------------------------
+  worker:
+    build:
+      context: .
+      target: runtime
+    container_name: aivora-worker
+    restart: unless-stopped
+    command: >
+      celery -A app.workers.celery_worker:celery_app worker
+      --loglevel=info -Q default,documents,notifications
+      --concurrency=4
+    env_file: .env
+    environment:
+      DATABASE_HOST: postgres
+      REDIS_HOST: redis
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - aivora-net
+
+  # ----------------------------------------------------------------
+  # PostgreSQL 16
+  # ----------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: aivora-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aivora
+      POSTGRES_USER: aivora
+      POSTGRES_PASSWORD: aivora_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aivora -d aivora"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aivora-net
+
+  # ----------------------------------------------------------------
+  # Redis 7
+  # ----------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: aivora-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aivora-net
+
+  # ----------------------------------------------------------------
+  # Elasticsearch 8
+  # ----------------------------------------------------------------
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: aivora-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\\|yellow\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - aivora-net
+
+  # ----------------------------------------------------------------
+  # Kibana (optional — comment out to save RAM)
+  # ----------------------------------------------------------------
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.0
+    container_name: aivora-kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - aivora-net
+    profiles:
+      - kibana  # Start with: docker compose --profile kibana up
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+
+networks:
+  aivora-net:
+    driver: bridge
