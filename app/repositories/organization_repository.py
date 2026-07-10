@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.organization.entity import IOrganizationRepository, OrganizationEntity, Slug
 from app.infrastructure.models.organization import OrganizationModel
@@ -17,7 +17,7 @@ class OrganizationRepository(BaseRepository[OrganizationModel], IOrganizationRep
 
     model = OrganizationModel
 
-    async def get_by_id(self, org_id: uuid.UUID) -> OrganizationEntity | None:
+    async def get_by_id(self, org_id: uuid.UUID) -> OrganizationEntity | None:  # type: ignore[override]
         stmt = select(OrganizationModel).where(
             OrganizationModel.id == org_id,
             OrganizationModel.deleted_at.is_(None),
@@ -57,7 +57,15 @@ class OrganizationRepository(BaseRepository[OrganizationModel], IOrganizationRep
 
         if existing_model:
             model = DataMapper.org_to_model(org)
-            for attr in ("name", "slug", "plan", "status", "owner_id", "max_users", "max_documents"):
+            for attr in (
+                "name",
+                "slug",
+                "plan",
+                "status",
+                "owner_id",
+                "max_users",
+                "max_documents",
+            ):
                 setattr(existing_model, attr, getattr(model, attr))
             existing_model.updated_at = org.updated_at
             await self._session.flush()
@@ -67,11 +75,12 @@ class OrganizationRepository(BaseRepository[OrganizationModel], IOrganizationRep
             await self.create(model)
             return org
 
-    async def delete(self, org_id: uuid.UUID) -> None:
+    async def delete(self, org_id: uuid.UUID) -> None:  # type: ignore[override]
         stmt = select(OrganizationModel).where(OrganizationModel.id == org_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
         if model:
             from app.domain.base import utcnow
+
             model.deleted_at = utcnow()
             await self._session.flush()

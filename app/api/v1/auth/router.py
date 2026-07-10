@@ -43,6 +43,5 @@ async def refresh(
 @router.post("/logout", response_model=MessageResponse)
 async def logout() -> MessageResponse:
     """Invalidate the current user's refresh token."""
-    # Logout successfully invalidates state client-side, or can blacklist tokens in Redis if required
+    # Token is invalidated client-side; server-side blacklisting can be added if needed.
     return MessageResponse(message="Logged out successfully.")
-

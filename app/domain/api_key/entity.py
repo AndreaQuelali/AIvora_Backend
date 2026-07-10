@@ -49,7 +49,7 @@ class ApiKeyEntity(AggregateRoot):
         user_id: uuid.UUID,
         scopes: list[str] | None = None,
         expires_at: datetime | None = None,
-    ) -> tuple["ApiKeyEntity", str]:
+    ) -> tuple[ApiKeyEntity, str]:
         """Create a new API key, returning the entity and the plaintext key.
 
         The plaintext key is returned ONCE and never stored.
@@ -78,6 +78,7 @@ class ApiKeyEntity(AggregateRoot):
         if self.expires_at is None:
             return False
         from app.domain.base import utcnow
+
         return utcnow() > self.expires_at
 
     @property

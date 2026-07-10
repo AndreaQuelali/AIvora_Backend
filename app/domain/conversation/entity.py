@@ -97,7 +97,6 @@ class ConversationEntity(AggregateRoot):
             status=ConversationStatus.ACTIVE,
         )
 
-
     def add_message(self, message: MessageEntity) -> None:
         """Append a message to this conversation."""
         self.messages.append(message)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 
 from app.config.settings import get_settings

@@ -4,6 +4,14 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.infrastructure.models.api_key import ApiKeyModel
+    from app.infrastructure.models.conversation import ConversationModel
+    from app.infrastructure.models.document import DocumentModel
+    from app.infrastructure.models.organization import OrganizationModel
+    from app.infrastructure.models.role import RoleModel
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -26,35 +34,29 @@ class UserModel(Base, UUIDMixin, TimestampMixin):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    status: Mapped[str] = mapped_column(
-        String(50), nullable=False, default="pending_verification"
-    )
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending_verification")
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    last_login_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    deleted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
-    organization: Mapped["OrganizationModel | None"] = relationship(  # noqa: F821
+    organization: Mapped["OrganizationModel | None"] = relationship(
         "OrganizationModel", back_populates="members", lazy="select"
     )
-    roles: Mapped[list["RoleModel"]] = relationship(  # noqa: F821
+    roles: Mapped[list["RoleModel"]] = relationship(
         "RoleModel",
         secondary="user_roles",
         back_populates="users",
         lazy="select",
     )
-    api_keys: Mapped[list["ApiKeyModel"]] = relationship(  # noqa: F821
+    api_keys: Mapped[list["ApiKeyModel"]] = relationship(
         "ApiKeyModel", back_populates="user", cascade="all, delete-orphan", lazy="select"
     )
-    documents: Mapped[list["DocumentModel"]] = relationship(  # noqa: F821
+    documents: Mapped[list["DocumentModel"]] = relationship(
         "DocumentModel", back_populates="uploader", lazy="select"
     )
-    conversations: Mapped[list["ConversationModel"]] = relationship(  # noqa: F821
+    conversations: Mapped[list["ConversationModel"]] = relationship(
         "ConversationModel", back_populates="user", lazy="select"
     )
 

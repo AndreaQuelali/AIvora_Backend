@@ -7,9 +7,8 @@ Settings are composed into logical groups and exposed via a cached singleton.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Any
 
-from pydantic import Field, PostgresDsn, RedisDsn, field_validator, model_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -126,12 +125,8 @@ class JWTSettings(BaseSettings):
 
     secret_key: str = Field(alias="JWT_SECRET_KEY")
     algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
-    access_token_expire_minutes: int = Field(
-        default=30, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES"
-    )
-    refresh_token_expire_days: int = Field(
-        default=7, alias="JWT_REFRESH_TOKEN_EXPIRE_DAYS"
-    )
+    access_token_expire_minutes: int = Field(default=30, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, alias="JWT_REFRESH_TOKEN_EXPIRE_DAYS")
 
 
 class CORSSettings(BaseSettings):

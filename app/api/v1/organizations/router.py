@@ -8,7 +8,11 @@ from fastapi import APIRouter, Depends
 
 from app.dependencies.auth import get_current_user_id
 from app.schemas.common import StandardResponse
-from app.schemas.organization import OrganizationCreateRequest, OrganizationResponse, OrganizationUpdateRequest
+from app.schemas.organization import (
+    OrganizationCreateRequest,
+    OrganizationResponse,
+    OrganizationUpdateRequest,
+)
 
 router = APIRouter(prefix="/organizations", tags=["Organizations"])
 

@@ -11,12 +11,12 @@ from __future__ import annotations
 import uuid
 from abc import ABC
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def utcnow() -> datetime:
     """Return current UTC datetime (timezone-aware)."""
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 def new_uuid() -> uuid.UUID:
@@ -115,7 +115,7 @@ class AggregateRoot(Entity):
 # ---------------------------------------------------------------------------
 
 
-class IRepository[T](ABC):
+class IRepository[T](ABC):  # noqa: B024
     """Generic repository interface.
 
     Implementations live in the infrastructure layer (SQLAlchemy).

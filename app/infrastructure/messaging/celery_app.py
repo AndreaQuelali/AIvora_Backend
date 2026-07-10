@@ -26,7 +26,7 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
     task_track_started=True,
-    task_acks_late=True,           # Re-queue task if worker crashes
+    task_acks_late=True,  # Re-queue task if worker crashes
     worker_prefetch_multiplier=1,  # Prevent memory spike with large payloads
     task_routes={
         "app.tasks.document_tasks.*": {"queue": "documents"},

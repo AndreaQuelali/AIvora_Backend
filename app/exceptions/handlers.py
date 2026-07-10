@@ -85,8 +85,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             path=request.url.path,
         )
         detail = "; ".join(
-            f"{' -> '.join(str(loc) for loc in err['loc'])}: {err['msg']}"
-            for err in errors
+            f"{' -> '.join(str(loc) for loc in err['loc'])}: {err['msg']}" for err in errors
         )
         return _error_response(
             request,

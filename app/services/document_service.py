@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
-from app.domain.document.entity import DocumentEntity, DocumentStatus, FileSize, StoragePath
+from app.domain.document.entity import DocumentEntity, FileSize, StoragePath
 from app.exceptions.base import NotFoundError
 from app.infrastructure.storage.base import IFileStorage
 from app.repositories.document_repository import DocumentRepository
@@ -35,7 +34,7 @@ class DocumentService:
         uploader_id: uuid.UUID,
         organization_id: uuid.UUID,
     ) -> DocumentUploadResponse:
-        """Process file uploads by storing content, creating record, and dispatching Celery pipeline."""
+        """Process file uploads: store content, create record, dispatch Celery pipeline."""
         # 1. Generate unique file storage path
         file_extension = filename.split(".")[-1] if "." in filename else "bin"
         unique_id = uuid.uuid4()

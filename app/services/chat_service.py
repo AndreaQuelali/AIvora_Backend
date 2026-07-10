@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
 from app.domain.conversation.entity import ConversationEntity, MessageEntity, MessageRole
 from app.exceptions.base import NotFoundError

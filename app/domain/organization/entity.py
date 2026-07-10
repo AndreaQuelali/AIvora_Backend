@@ -9,7 +9,6 @@ from enum import StrEnum
 
 from app.domain.base import AggregateRoot, DomainEvent, IRepository, ValueObject
 
-
 # ---------------------------------------------------------------------------
 # Value Objects
 # ---------------------------------------------------------------------------
@@ -23,8 +22,11 @@ class Slug(ValueObject):
 
     def __post_init__(self) -> None:
         import re
+
         if not re.match(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", self.value):
-            raise ValueError(f"Invalid slug: {self.value!r}. Must be lowercase alphanumeric with hyphens.")
+            raise ValueError(
+                f"Invalid slug: {self.value!r}. Must be lowercase alphanumeric with hyphens."
+            )
 
     def __str__(self) -> str:
         return self.value

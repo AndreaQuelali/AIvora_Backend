@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, ForeignKey, String, Table, Column
+if TYPE_CHECKING:
+    from app.infrastructure.models.organization import OrganizationModel
+    from app.infrastructure.models.user import UserModel
+
+from sqlalchemy import Boolean, Column, ForeignKey, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,15 +22,26 @@ from app.infrastructure.database.base import Base, TimestampMixin, UUIDMixin
 UserRoleModel = Table(
     "user_roles",
     Base.metadata,
-    Column("user_id", UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
-    Column("role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    Column(
+        "user_id", UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    ),
+    Column(
+        "role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True
+    ),
 )
 
 RolePermissionModel = Table(
     "role_permissions",
     Base.metadata,
-    Column("role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
-    Column("permission_id", UUID(as_uuid=True), ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True),
+    Column(
+        "role_id", UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True
+    ),
+    Column(
+        "permission_id",
+        UUID(as_uuid=True),
+        ForeignKey("permissions.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 
@@ -68,10 +84,10 @@ class RoleModel(Base, UUIDMixin, TimestampMixin):
     description: Mapped[str] = mapped_column(String(500), default="")
     is_system: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    organization: Mapped["OrganizationModel | None"] = relationship(  # noqa: F821
+    organization: Mapped["OrganizationModel | None"] = relationship(
         "OrganizationModel", back_populates="roles", lazy="select"
     )
-    users: Mapped[list["UserModel"]] = relationship(  # noqa: F821
+    users: Mapped[list["UserModel"]] = relationship(
         "UserModel", secondary="user_roles", back_populates="roles", lazy="select"
     )
     permissions: Mapped[list[PermissionModel]] = relationship(

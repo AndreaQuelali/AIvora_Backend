@@ -24,8 +24,12 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+        pass_filenames: false
+        args: ["app/"]
         additional_dependencies:
           - pydantic>=2.10.0
           - pydantic-settings>=2.7.0
           - types-passlib
           - types-python-jose
+          - types-redis
+          - sqlalchemy>=2.0.35

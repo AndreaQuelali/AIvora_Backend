@@ -1,4 +1,4 @@
-"""Mappers between pure domain entities (Domain layer) and SQLAlchemy ORM models (Infrastructure layer).
+"""Mappers between pure domain entities and SQLAlchemy ORM models.
 
 Enforces strict separation of concerns, keeping the Domain layer completely
 independent of SQLAlchemy and database schemas.
@@ -7,22 +7,37 @@ independent of SQLAlchemy and database schemas.
 from __future__ import annotations
 
 import uuid
-from app.domain.user.entity import UserEntity, Email, HashedPassword, UserStatus
-from app.domain.organization.entity import OrganizationEntity, Slug, OrganizationPlan, OrganizationStatus
-from app.domain.document.entity import DocumentEntity, FileSize, StoragePath, DocumentType, DocumentStatus
-from app.domain.conversation.entity import ConversationEntity, MessageEntity, ConversationStatus, MessageRole
-from app.domain.api_key.entity import ApiKeyEntity
-from app.domain.audit.entity import AuditLogEntity, AuditAction
-from app.domain.role.entity import PermissionEntity, RoleEntity
 
-from app.infrastructure.models.user import UserModel
-from app.infrastructure.models.organization import OrganizationModel
-from app.infrastructure.models.document import DocumentModel
-from app.infrastructure.models.conversation import ConversationModel, MessageModel
+from app.domain.api_key.entity import ApiKeyEntity
+from app.domain.audit.entity import AuditAction, AuditLogEntity
+from app.domain.conversation.entity import (
+    ConversationEntity,
+    ConversationStatus,
+    MessageEntity,
+    MessageRole,
+)
+from app.domain.document.entity import (
+    DocumentEntity,
+    DocumentStatus,
+    DocumentType,
+    FileSize,
+    StoragePath,
+)
+from app.domain.organization.entity import (
+    OrganizationEntity,
+    OrganizationPlan,
+    OrganizationStatus,
+    Slug,
+)
+from app.domain.role.entity import PermissionEntity, RoleEntity
+from app.domain.user.entity import Email, HashedPassword, UserEntity, UserStatus
 from app.infrastructure.models.api_key import ApiKeyModel
 from app.infrastructure.models.audit_log import AuditLogModel
-from app.infrastructure.models.role import RoleModel, PermissionModel
-
+from app.infrastructure.models.conversation import ConversationModel, MessageModel
+from app.infrastructure.models.document import DocumentModel
+from app.infrastructure.models.organization import OrganizationModel
+from app.infrastructure.models.role import PermissionModel, RoleModel
+from app.infrastructure.models.user import UserModel
 
 
 class DataMapper:
@@ -177,7 +192,9 @@ class DataMapper:
             user_id=model.user_id,
             title=model.title,
             status=ConversationStatus(model.status),
-            messages=[DataMapper.message_to_entity(m) for m in model.messages] if model.messages else [],
+            messages=[DataMapper.message_to_entity(m) for m in model.messages]
+            if model.messages
+            else [],
         )
 
     @staticmethod
@@ -246,7 +263,7 @@ class DataMapper:
             resource_id=model.resource_id,
             ip_address=model.ip_address,
             user_agent=model.user_agent,
-            metadata=model.metadata,
+            metadata=model.extra_metadata,
             success=model.success,
             error_message=model.error_message,
         )
@@ -265,7 +282,7 @@ class DataMapper:
             resource_id=entity.resource_id,
             ip_address=entity.ip_address,
             user_agent=entity.user_agent,
-            metadata=entity.metadata,
+            extra_metadata=entity.metadata,
             success=entity.success,
             error_message=entity.error_message,
         )
@@ -321,4 +338,3 @@ class DataMapper:
             resource=entity.resource,
             action=entity.action,
         )
-

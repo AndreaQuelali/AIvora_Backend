@@ -8,13 +8,17 @@ from fastapi import APIRouter, Depends, File, UploadFile
 
 from app.dependencies.auth import get_current_user_id
 from app.dependencies.pagination import PaginationParams, get_pagination
-from app.dependencies.services import get_document_service, get_user_repository, get_document_repository
-from app.exceptions.base import UnauthorizedError, ForbiddenError
+from app.dependencies.services import (
+    get_document_repository,
+    get_document_service,
+    get_user_repository,
+)
+from app.exceptions.base import ForbiddenError
+from app.repositories.document_repository import DocumentRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.common import PaginatedResponse, StandardResponse
 from app.schemas.document import DocumentResponse, DocumentUploadResponse
 from app.services.document_service import DocumentService
-from app.repositories.user_repository import UserRepository
-from app.repositories.document_repository import DocumentRepository
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -61,14 +65,13 @@ async def list_documents(
     )
     # Count total
     total = await doc_repo.count_by_organization(user.organization_id)
-    
+
     return PaginatedResponse.create(
         data=[DocumentResponse.model_validate(d) for d in docs],
         total=total,
         page=pagination.page,
         page_size=pagination.page_size,
     )
-
 
 
 @router.get("/{document_id}", response_model=StandardResponse[DocumentResponse])
@@ -90,4 +93,3 @@ async def delete_document(
 ) -> None:
     """Delete a document and its indexed chunks."""
     await doc_repo.delete(document_id)
-

@@ -10,11 +10,13 @@ from app.dependencies.auth import get_current_user_id
 from app.dependencies.pagination import PaginationParams, get_pagination
 from app.dependencies.services import (
     get_chat_service,
-    get_user_repository,
     get_conversation_repository,
     get_message_repository,
+    get_user_repository,
 )
 from app.exceptions.base import ForbiddenError
+from app.repositories.conversation_repository import ConversationRepository, MessageRepository
+from app.repositories.user_repository import UserRepository
 from app.schemas.common import PaginatedResponse, StandardResponse
 from app.schemas.conversation import (
     ConversationCreateRequest,
@@ -23,13 +25,13 @@ from app.schemas.conversation import (
     MessageResponse,
 )
 from app.services.chat_service import ChatService
-from app.repositories.user_repository import UserRepository
-from app.repositories.conversation_repository import ConversationRepository, MessageRepository
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
 
-@router.post("/conversations", response_model=StandardResponse[ConversationResponse], status_code=201)
+@router.post(
+    "/conversations", response_model=StandardResponse[ConversationResponse], status_code=201
+)
 async def create_conversation(
     body: ConversationCreateRequest,
     current_user_id: uuid.UUID = Depends(get_current_user_id),
@@ -72,7 +74,9 @@ async def list_conversations(
     )
 
 
-@router.get("/conversations/{conversation_id}", response_model=StandardResponse[ConversationResponse])
+@router.get(
+    "/conversations/{conversation_id}", response_model=StandardResponse[ConversationResponse]
+)
 async def get_conversation(
     conversation_id: uuid.UUID,
     current_user_id: uuid.UUID = Depends(get_current_user_id),
@@ -83,7 +87,11 @@ async def get_conversation(
     return StandardResponse(data=conv)
 
 
-@router.post("/conversations/{conversation_id}/messages", response_model=StandardResponse[MessageResponse], status_code=201)
+@router.post(
+    "/conversations/{conversation_id}/messages",
+    response_model=StandardResponse[MessageResponse],
+    status_code=201,
+)
 async def send_message(
     conversation_id: uuid.UUID,
     body: MessageCreateRequest,
@@ -95,7 +103,9 @@ async def send_message(
     return StandardResponse(data=msg)
 
 
-@router.get("/conversations/{conversation_id}/messages", response_model=PaginatedResponse[MessageResponse])
+@router.get(
+    "/conversations/{conversation_id}/messages", response_model=PaginatedResponse[MessageResponse]
+)
 async def list_messages(
     conversation_id: uuid.UUID,
     pagination: PaginationParams = Depends(get_pagination),
@@ -115,4 +125,3 @@ async def list_messages(
         page=pagination.page,
         page_size=pagination.page_size,
     )
-

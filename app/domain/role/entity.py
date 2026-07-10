@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 
 from app.domain.base import AggregateRoot, Entity, IRepository
 
-
 # ---------------------------------------------------------------------------
 # Permission Entity
 # ---------------------------------------------------------------------------

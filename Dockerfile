@@ -19,7 +19,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install dependencies (layer cached independently)
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -e .
 

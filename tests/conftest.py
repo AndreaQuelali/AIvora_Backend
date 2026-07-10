@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 
 @pytest.fixture(scope="session")
@@ -12,9 +12,11 @@ def app():
     """Create a test FastAPI app instance."""
     # Clear settings cache to avoid polluting test env
     from app.config.settings import get_settings
+
     get_settings.cache_clear()
 
     from app.core.app import create_app
+
     return create_app()
 
 

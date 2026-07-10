@@ -20,7 +20,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
 
     def __init__(self, app: object, *, is_production: bool = False) -> None:
-        super().__init__(app)  # type: ignore[arg-type]
+        super().__init__(app)
         self._is_production = is_production
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:

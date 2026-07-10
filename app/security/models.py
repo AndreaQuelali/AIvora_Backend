@@ -17,9 +17,9 @@ class TokenPair(BaseModel):
 class TokenPayload(BaseModel):
     """Decoded JWT payload structure."""
 
-    sub: str          # user ID
-    exp: int          # expiry timestamp
-    iat: int          # issued-at timestamp
-    type: str         # "access" | "refresh"
+    sub: str  # user ID
+    exp: int  # expiry timestamp
+    iat: int  # issued-at timestamp
+    type: str  # "access" | "refresh"
     org_id: str | None = None
     roles: list[str] = []

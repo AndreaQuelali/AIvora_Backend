@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
-from app.domain.user.entity import Email, HashedPassword
-from app.exceptions.base import NotFoundError, UnauthorizedError
+from app.domain.user.entity import Email
+from app.exceptions.base import UnauthorizedError
 from app.repositories.user_repository import UserRepository
 from app.security.jwt import create_access_token, create_refresh_token, decode_token
 from app.security.models import TokenPair
@@ -37,6 +36,7 @@ class AuthService:
         refresh_token = create_refresh_token(subject=str(user.id))
 
         from app.config.settings import get_settings
+
         settings = get_settings()
 
         return TokenPair(
@@ -71,6 +71,7 @@ class AuthService:
         new_refresh = create_refresh_token(subject=str(user.id))
 
         from app.config.settings import get_settings
+
         settings = get_settings()
 
         return TokenPair(

@@ -9,7 +9,6 @@ from enum import StrEnum
 
 from app.domain.base import AggregateRoot, DomainEvent, IRepository, ValueObject
 
-
 # ---------------------------------------------------------------------------
 # Value Objects
 # ---------------------------------------------------------------------------
@@ -100,9 +99,7 @@ class UserEntity(AggregateRoot):
     """
 
     email: Email = field(default_factory=lambda: Email("placeholder@example.com"))
-    hashed_password: HashedPassword = field(
-        default_factory=lambda: HashedPassword("")
-    )
+    hashed_password: HashedPassword = field(default_factory=lambda: HashedPassword(""))
     full_name: str = ""
     organization_id: uuid.UUID | None = None
     role_ids: set[uuid.UUID] = field(default_factory=set)
@@ -139,7 +136,6 @@ class UserEntity(AggregateRoot):
             )
         )
         return user
-
 
     def activate(self) -> None:
         """Mark the user as active after email verification."""

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.conversation.entity import (
@@ -23,7 +23,7 @@ class ConversationRepository(BaseRepository[ConversationModel], IConversationRep
 
     model = ConversationModel
 
-    async def get_by_id(self, conversation_id: uuid.UUID) -> ConversationEntity | None:
+    async def get_by_id(self, conversation_id: uuid.UUID) -> ConversationEntity | None:  # type: ignore[override]
         stmt = (
             select(ConversationModel)
             .where(
@@ -72,12 +72,13 @@ class ConversationRepository(BaseRepository[ConversationModel], IConversationRep
             await self.create(model)
             return conversation
 
-    async def delete(self, conversation_id: uuid.UUID) -> None:
+    async def delete(self, conversation_id: uuid.UUID) -> None:  # type: ignore[override]
         stmt = select(ConversationModel).where(ConversationModel.id == conversation_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
         if model:
             from app.domain.base import utcnow
+
             model.deleted_at = utcnow()
             await self._session.flush()
 

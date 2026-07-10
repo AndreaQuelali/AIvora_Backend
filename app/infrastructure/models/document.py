@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String, Text
+if TYPE_CHECKING:
+    from app.infrastructure.models.organization import OrganizationModel
+    from app.infrastructure.models.user import UserModel
+
+from sqlalchemy import BigInteger, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,10 +44,10 @@ class DocumentModel(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
-    organization: Mapped["OrganizationModel"] = relationship(  # noqa: F821
+    organization: Mapped["OrganizationModel"] = relationship(
         "OrganizationModel", back_populates="documents", lazy="select"
     )
-    uploader: Mapped["UserModel | None"] = relationship(  # noqa: F821
+    uploader: Mapped["UserModel | None"] = relationship(
         "UserModel", back_populates="documents", lazy="select"
     )
 

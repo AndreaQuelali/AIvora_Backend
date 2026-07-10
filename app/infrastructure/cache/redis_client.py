@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
 from app.config.settings import get_settings
 
-_redis_client: Redis | None = None  # type: ignore[type-arg]
+_redis_client: Redis[Any] | None = None
 
 
-async def get_redis_client() -> Redis:  # type: ignore[type-arg]
+async def get_redis_client() -> Redis[Any]:
     """Return the module-level Redis client, creating it on first call."""
     global _redis_client
     if _redis_client is None:
@@ -27,18 +29,18 @@ async def close_redis_client() -> None:
     """Close the Redis connection pool."""
     global _redis_client
     if _redis_client is not None:
-        await _redis_client.aclose()
+        await _redis_client.close()
         _redis_client = None
 
 
 class RedisCache:
     """High-level Redis cache operations."""
 
-    def __init__(self, client: Redis) -> None:  # type: ignore[type-arg]
+    def __init__(self, client: Redis[Any]) -> None:
         self._client = client
 
     async def get(self, key: str) -> str | None:
-        return await self._client.get(key)  # type: ignore[return-value]
+        return await self._client.get(key)
 
     async def set(self, key: str, value: str, *, ttl_seconds: int | None = None) -> None:
         if ttl_seconds:
@@ -53,7 +55,7 @@ class RedisCache:
         return bool(await self._client.exists(key))
 
     async def increment(self, key: str) -> int:
-        return int(await self._client.incr(key))  # type: ignore[return-value]
+        return int(await self._client.incr(key))
 
     async def expire(self, key: str, ttl_seconds: int) -> None:
         await self._client.expire(key, ttl_seconds)

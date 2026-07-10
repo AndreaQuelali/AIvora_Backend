@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.user.entity import Email, IUserRepository, UserEntity
@@ -18,7 +18,7 @@ class UserRepository(BaseRepository[UserModel], IUserRepository):
 
     model = UserModel
 
-    async def get_by_id(self, user_id: uuid.UUID) -> UserEntity | None:
+    async def get_by_id(self, user_id: uuid.UUID) -> UserEntity | None:  # type: ignore[override]
         stmt = (
             select(UserModel)
             .where(UserModel.id == user_id, UserModel.deleted_at.is_(None))
@@ -78,12 +78,13 @@ class UserRepository(BaseRepository[UserModel], IUserRepository):
             await self.create(model)
             return user
 
-    async def delete(self, user_id: uuid.UUID) -> None:
+    async def delete(self, user_id: uuid.UUID) -> None:  # type: ignore[override]
         stmt = select(UserModel).where(UserModel.id == user_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
         if model:
             from app.domain.base import utcnow
+
             model.deleted_at = utcnow()
             await self._session.flush()
 

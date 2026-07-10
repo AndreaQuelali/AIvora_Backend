@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class ServiceStatus(BaseModel):
     name: str
-    status: str   # "ok" | "degraded" | "unavailable"
+    status: str  # "ok" | "degraded" | "unavailable"
     latency_ms: float | None = None
 
 

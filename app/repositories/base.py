@@ -73,4 +73,3 @@ class BaseRepository(Generic[ModelT]):
                 stmt = stmt.where(getattr(self.model, key) == value)
         result = await self._session.execute(stmt)
         return result.scalar_one()
-

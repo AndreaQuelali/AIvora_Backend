@@ -6,10 +6,9 @@ import uuid
 
 import pytest
 
-from app.exceptions.base import TokenExpiredError, TokenInvalidError
+from app.exceptions.base import TokenInvalidError
 from app.security.jwt import create_access_token, create_refresh_token, decode_token
 from app.security.password import hash_password, verify_password
-
 
 # ---------------------------------------------------------------------------
 # Password hashing

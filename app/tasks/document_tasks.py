@@ -12,7 +12,7 @@ from app.infrastructure.messaging.celery_app import celery_app
     default_retry_delay=30,
     queue="documents",
 )
-def process_document_task(self: object, document_id: str) -> dict[str, str]:  # type: ignore[type-arg]
+def process_document_task(self: object, document_id: str) -> dict[str, str]:
     """Process an uploaded document: extract text, chunk, embed, index.
 
     TODO: Implement when RAG pipeline is ready:

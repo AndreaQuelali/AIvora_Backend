@@ -9,7 +9,6 @@ from enum import StrEnum
 
 from app.domain.base import AggregateRoot, DomainEvent, IRepository, ValueObject
 
-
 # ---------------------------------------------------------------------------
 # Value Objects
 # ---------------------------------------------------------------------------
@@ -44,11 +43,11 @@ class StoragePath(ValueObject):
 class DocumentStatus(StrEnum):
     """Document processing lifecycle status."""
 
-    PENDING = "pending"          # Uploaded, awaiting processing
-    PROCESSING = "processing"    # Celery worker is processing
-    INDEXED = "indexed"          # In Elasticsearch, ready for RAG
-    FAILED = "failed"            # Processing failed
-    ARCHIVED = "archived"        # Soft-archived, not searchable
+    PENDING = "pending"  # Uploaded, awaiting processing
+    PROCESSING = "processing"  # Celery worker is processing
+    INDEXED = "indexed"  # In Elasticsearch, ready for RAG
+    FAILED = "failed"  # Processing failed
+    ARCHIVED = "archived"  # Soft-archived, not searchable
 
 
 class DocumentType(StrEnum):
@@ -172,7 +171,6 @@ class DocumentEntity(AggregateRoot):
         return doc
 
     def mark_processing(self) -> None:
-
         """Transition to PROCESSING status."""
         self.status = DocumentStatus.PROCESSING
         self.touch()
@@ -183,18 +181,14 @@ class DocumentEntity(AggregateRoot):
         self.chunk_count = chunk_count
         self.elasticsearch_index = index_name
         self.touch()
-        self.record_event(
-            DocumentIndexedEvent(document_id=self.id, chunk_count=chunk_count)
-        )
+        self.record_event(DocumentIndexedEvent(document_id=self.id, chunk_count=chunk_count))
 
     def mark_failed(self, reason: str) -> None:
         """Transition to FAILED with an error message."""
         self.status = DocumentStatus.FAILED
         self.error_message = reason
         self.touch()
-        self.record_event(
-            DocumentProcessingFailedEvent(document_id=self.id, reason=reason)
-        )
+        self.record_event(DocumentProcessingFailedEvent(document_id=self.id, reason=reason))
 
     def archive(self) -> None:
         """Soft-archive the document."""

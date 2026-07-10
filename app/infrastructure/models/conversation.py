@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.infrastructure.models.user import UserModel
 
 from sqlalchemy import ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
@@ -15,7 +19,10 @@ class ConversationModel(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "conversations"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
@@ -23,10 +30,12 @@ class ConversationModel(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     title: Mapped[str] = mapped_column(String(500), default="New Conversation")
     status: Mapped[str] = mapped_column(String(50), default="active")
 
-    messages: Mapped[list["MessageModel"]] = relationship(
+    messages: Mapped[list[MessageModel]] = relationship(
         "MessageModel", back_populates="conversation", cascade="all, delete-orphan", lazy="select"
     )
-    user: Mapped["UserModel"] = relationship("UserModel", back_populates="conversations", lazy="select")  # noqa: F821
+    user: Mapped["UserModel"] = relationship(
+        "UserModel", back_populates="conversations", lazy="select"
+    )
 
     def __repr__(self) -> str:
         return f"<ConversationModel id={self.id} title={self.title!r}>"
@@ -36,7 +45,10 @@ class MessageModel(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "messages"
 
     conversation_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False, index=True
+        UUID(as_uuid=True),
+        ForeignKey("conversations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)

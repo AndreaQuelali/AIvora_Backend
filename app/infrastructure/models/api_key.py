@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.infrastructure.models.user import UserModel
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
@@ -16,7 +20,10 @@ class ApiKeyModel(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "api_keys"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
@@ -29,7 +36,7 @@ class ApiKeyModel(Base, UUIDMixin, TimestampMixin):
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     scopes: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
 
-    user: Mapped["UserModel"] = relationship("UserModel", back_populates="api_keys", lazy="select")  # noqa: F821
+    user: Mapped["UserModel"] = relationship("UserModel", back_populates="api_keys", lazy="select")
 
     def __repr__(self) -> str:
         return f"<ApiKeyModel id={self.id} prefix={self.prefix!r}>"

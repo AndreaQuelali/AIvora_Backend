@@ -7,11 +7,11 @@ import uuid
 from fastapi import APIRouter, Depends
 
 from app.dependencies.auth import get_current_user_id
-from app.dependencies.services import get_user_service, get_user_repository
+from app.dependencies.services import get_user_repository, get_user_service
+from app.repositories.user_repository import UserRepository
 from app.schemas.common import StandardResponse
 from app.schemas.user import UserResponse, UserUpdateRequest
 from app.services.user_service import UserService
-from app.repositories.user_repository import UserRepository
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -58,4 +58,3 @@ async def delete_user(
 ) -> None:
     """Delete a user account."""
     await user_repo.delete(user_id)
-

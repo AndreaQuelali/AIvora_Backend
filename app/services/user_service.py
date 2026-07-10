@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
 
-from app.domain.user.entity import Email, HashedPassword, UserEntity, UserStatus
+from app.domain.user.entity import Email, HashedPassword, UserEntity
 from app.exceptions.base import ConflictError, NotFoundError
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreateRequest, UserResponse, UserUpdateRequest

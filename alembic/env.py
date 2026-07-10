@@ -9,10 +9,11 @@ from alembic import context
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlalchemy.pool import NullPool
 
-# Import all models so Alembic can detect them for autogenerate
-from app.infrastructure.models import *  # noqa: F401, F403
-from app.infrastructure.database.base import Base
 from app.config.settings import get_settings
+from app.infrastructure.database.base import Base
+
+# Import all models so Alembic can detect them for autogenerate
+from app.infrastructure.models import *  # noqa: F403
 
 config = context.config
 settings = get_settings()

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.audit.entity import AuditAction, AuditLogEntity, IAuditRepository
 from app.infrastructure.models.audit_log import AuditLogModel

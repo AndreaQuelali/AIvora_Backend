@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.role.entity import IPermissionRepository, IRoleRepository, PermissionEntity, RoleEntity
+from app.domain.role.entity import (
+    IPermissionRepository,
+    IRoleRepository,
+    PermissionEntity,
+    RoleEntity,
+)
 from app.infrastructure.models.role import PermissionModel, RoleModel
 from app.repositories.base import BaseRepository
 from app.repositories.mappers import DataMapper
@@ -18,7 +23,7 @@ class RoleRepository(BaseRepository[RoleModel], IRoleRepository):
 
     model = RoleModel
 
-    async def get_by_id(self, role_id: uuid.UUID) -> RoleEntity | None:
+    async def get_by_id(self, role_id: uuid.UUID) -> RoleEntity | None:  # type: ignore[override]
         stmt = (
             select(RoleModel)
             .where(RoleModel.id == role_id)
@@ -40,9 +45,7 @@ class RoleRepository(BaseRepository[RoleModel], IRoleRepository):
         model = result.scalar_one_or_none()
         return DataMapper.role_to_entity(model) if model else None
 
-    async def list_all(
-        self, *, organization_id: uuid.UUID | None = None
-    ) -> list[RoleEntity]:
+    async def list_all(self, *, organization_id: uuid.UUID | None = None) -> list[RoleEntity]:
         stmt = (
             select(RoleModel)
             .where(RoleModel.organization_id == organization_id)
@@ -69,7 +72,7 @@ class RoleRepository(BaseRepository[RoleModel], IRoleRepository):
             await self.create(model)
             return role
 
-    async def delete(self, role_id: uuid.UUID) -> None:
+    async def delete(self, role_id: uuid.UUID) -> None:  # type: ignore[override]
         stmt = select(RoleModel).where(RoleModel.id == role_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
@@ -83,7 +86,7 @@ class PermissionRepository(BaseRepository[PermissionModel], IPermissionRepositor
 
     model = PermissionModel
 
-    async def get_by_id(self, perm_id: uuid.UUID) -> PermissionEntity | None:
+    async def get_by_id(self, perm_id: uuid.UUID) -> PermissionEntity | None:  # type: ignore[override]
         stmt = select(PermissionModel).where(PermissionModel.id == perm_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
@@ -44,7 +44,7 @@ class PaginatedResponse(BaseModel, Generic[DataT]):
         total: int,
         page: int,
         page_size: int,
-    ) -> "PaginatedResponse[DataT]":
+    ) -> PaginatedResponse[DataT]:
         pages = (total + page_size - 1) // page_size if page_size > 0 else 0
         return cls(data=data, total=total, page=page, page_size=page_size, pages=pages)
 

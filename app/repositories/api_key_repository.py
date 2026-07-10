@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.api_key.entity import ApiKeyEntity, IApiKeyRepository
 from app.infrastructure.models.api_key import ApiKeyModel
@@ -17,7 +17,7 @@ class ApiKeyRepository(BaseRepository[ApiKeyModel], IApiKeyRepository):
 
     model = ApiKeyModel
 
-    async def get_by_id(self, key_id: uuid.UUID) -> ApiKeyEntity | None:
+    async def get_by_id(self, key_id: uuid.UUID) -> ApiKeyEntity | None:  # type: ignore[override]
         stmt = select(ApiKeyModel).where(ApiKeyModel.id == key_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
@@ -54,7 +54,7 @@ class ApiKeyRepository(BaseRepository[ApiKeyModel], IApiKeyRepository):
             await self.create(model)
             return api_key
 
-    async def delete(self, key_id: uuid.UUID) -> None:
+    async def delete(self, key_id: uuid.UUID) -> None:  # type: ignore[override]
         stmt = select(ApiKeyModel).where(ApiKeyModel.id == key_id)
         result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()

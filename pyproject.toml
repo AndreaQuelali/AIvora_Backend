@@ -17,7 +17,7 @@ dependencies = [
   "uvicorn[standard]>=0.32.0",
 
   # Validation
-  "pydantic>=2.10.0",
+  "pydantic[email]>=2.10.0",
   "pydantic-settings>=2.7.0",
 
   # Database
@@ -87,6 +87,9 @@ dev = [
   "pre-commit>=4.0.0",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
 # ---------------------------------------------------------------------------
 # Ruff
 # ---------------------------------------------------------------------------
@@ -98,10 +101,14 @@ src = ["app", "tests"]
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP", "N", "ANN", "S", "RUF"]
 ignore = [
-  "ANN101",  # missing type annotation for self
-  "ANN102",  # missing type annotation for cls
   "ANN401",  # Any type allowed where needed
   "S101",    # assert allowed in tests
+  "B008",    # FastAPI Depends() in function defaults is idiomatic
+  "S104",    # allow binding to 0.0.0.0
+  "S105",    # false-positive: string constants mistaken for passwords
+  "S106",    # false-positive: string constants mistaken for passwords
+  "N818",    # allow AppException (not all exceptions need Error suffix)
+  "UP037",   # allow quoted type hints (needed for SQLAlchemy circular model relationships)
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -120,6 +127,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
 explicit_package_bases = true
+disable_error_code = ["misc"]  # FastAPI/Celery decorators are dynamically typed
 
 [[tool.mypy.overrides]]
 module = ["alembic.*", "celery.*", "kombu.*", "slowapi.*", "ulid.*"]
